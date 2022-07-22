@@ -23,7 +23,7 @@ function App() {
     //   });
     let response = await fetch("https://swapi.dev/api/films");
     let data = await response.json();
-    let transformedMovies = await data.results.map((movieData) => {
+    let transformedMovies = data.results.map((movieData) => {
       return {
         id: movieData.episode_id,
         title: movieData.title,
