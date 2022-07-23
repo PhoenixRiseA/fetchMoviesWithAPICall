@@ -2,6 +2,7 @@ import React, { useState, Fragment, useEffect, useCallback } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
+import MovieInputForm from "./components/AddMovies/MovieInputForm";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -71,8 +72,16 @@ function App() {
     content = <p>Loading...</p>;
   }
 
+  const addMovieHandler = (event) => {
+    // setMovies((prevMovies) => {
+    //   return [movie, ...prevMovies];
+    // });
+    // event.preventDefault();
+    console.log(event.target.value);
+  };
   return (
     <React.Fragment>
+      <MovieInputForm onAdd={addMovieHandler} type={"submit"} />
       <section>
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
