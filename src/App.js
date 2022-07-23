@@ -8,18 +8,19 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [noRetry, setNoRetry] = useState(false);
 
-  const noRetryHandler = () => {
-    setNoRetry(true);
-    // clearInterval(retry);
-  };
+  // const noRetryHandler = () => {
+  //   setNoRetry(true);
+  //   // clearInterval(retry);
+  // };
 
   const fetchMoviesHandler = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      let response = await fetch("https://swapi.dev/api/films");
+      let response = await fetch(
+        "https://create-react-movie-default-rtdb.firebaseio.com/movies.json"
+      );
 
       if (!response.ok) {
         throw new Error("Something went wrong!...retrying");
@@ -28,43 +29,77 @@ function App() {
 
       let data = await response.json();
 
-      let transformedMovies = data.results.map((movieData) => {
-        return {
-          id: movieData.episode_id,
-          title: movieData.title,
-          openingText: movieData.opening_crawl,
-          releaseDate: movieData.release_date,
-        };
-      });
+      const loadedMovies = [];
+      for (const key in data) {
+        loadedMovies.push({
+          id: key,
+          title: data[key].title,
+          openingText: data[key].openingText,
+          releaseDate: data[key].releaseDate,
+        });
+      }
+
       setLoading(false);
-      setMovies(transformedMovies);
+      setMovies(loadedMovies);
     } catch (error) {
       setError(error.message);
-      let retry;
+      // let retry;
 
-      if (!noRetry) {
-        retry = setInterval(fetchMoviesHandler, 5000);
-      } else {
-        clearInterval(retry);
-      }
-      retry = setInterval(fetchMoviesHandler, 5000);
+      // if (!noRetry) {
+      //   retry = setInterval(fetchMoviesHandler, 5000);
+
+      // } else {
+      //   clearInterval(retry);
+      //   setLoading(false);
+      // }
+      // retry = setInterval(fetchMoviesHandler, 5000);
     }
     setLoading(false);
-  }, [noRetry]);
+  }, []);
+
   useEffect(() => {
     fetchMoviesHandler();
   }, [fetchMoviesHandler]);
 
+  async function addMovieHandler(movie) {
+    const response = await fetch(
+      "https://create-react-movie-default-rtdb.firebaseio.com/movies.json",
+      {
+        method: "POST",
+        body: JSON.stringify(movie),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+  }
+  async function deleteMovieHandler(movie) {
+    const response = await fetch(
+      "https://create-react-movie-default-rtdb.firebaseio.com/movies.json",
+      {
+        method: "DELETE",
+        body: JSON.stringify(movie),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+  }
+
   let content = <p>Found no movies</p>;
 
   if (movies.length > 0) {
-    content = <MoviesList movies={movies} />;
+    content = <MoviesList movies={movies} deleteMovie={deleteMovieHandler} />;
   }
   if (error) {
     content = (
       <Fragment>
         <p>{error}</p>
-        <button onClick={noRetryHandler}>stop-retry</button>
+        {/* <button onClick={noRetryHandler}>stop-retry</button> */}
       </Fragment>
     );
   }
@@ -72,13 +107,6 @@ function App() {
     content = <p>Loading...</p>;
   }
 
-  const addMovieHandler = (event) => {
-    // setMovies((prevMovies) => {
-    //   return [movie, ...prevMovies];
-    // });
-    // event.preventDefault();
-    console.log(event.target.value);
-  };
   return (
     <React.Fragment>
       <MovieInputForm onAdd={addMovieHandler} type={"submit"} />

@@ -23,8 +23,8 @@ const MovieInputForm = (props) => {
       openingText: enteredOpeningText,
       releaseDate: enteredReleaseDate,
     };
-    // props.onAdd(movieData);
-    console.log(movieData);
+    props.onAdd(movieData);
+    // console.log(movieData);
     setEnteredTitle("");
     setEnteredOpeningText("");
     setEnteredReleasedDate("");
