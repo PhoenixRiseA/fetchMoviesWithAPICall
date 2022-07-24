@@ -28,6 +28,7 @@ function App() {
       }
 
       let data = await response.json();
+      console.log("in fetchMoviesHan", data);
 
       const loadedMovies = [];
       for (const key in data) {
@@ -38,7 +39,7 @@ function App() {
           releaseDate: data[key].releaseDate,
         });
       }
-
+      console.log(loadedMovies);
       setLoading(false);
       setMovies(loadedMovies);
     } catch (error) {
@@ -75,25 +76,11 @@ function App() {
     const data = await response.json();
     console.log(data);
   }
-  async function deleteMovieHandler(movie) {
-    const response = await fetch(
-      "https://create-react-movie-default-rtdb.firebaseio.com/movies.json",
-      {
-        method: "DELETE",
-        body: JSON.stringify(movie),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await response.json();
-    console.log(data);
-  }
 
   let content = <p>Found no movies</p>;
 
   if (movies.length > 0) {
-    content = <MoviesList movies={movies} deleteMovie={deleteMovieHandler} />;
+    content = <MoviesList movies={movies} />;
   }
   if (error) {
     content = (
